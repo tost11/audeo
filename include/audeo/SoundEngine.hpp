@@ -129,6 +129,8 @@ AUDEO_API bool is_playing(SoundSource source);
 // Returns true if the sound was loaded as a music sound
 AUDEO_API bool source_is_music(SoundSource source);
 
+AUDEO_API void set_default_volume(float volume);
+
 // The volume parameter is a value between 0 and 1, where 0 means silent and
 // 1 means max volume. Any value outside this range will be clamped to fit
 // the range

@@ -39,6 +39,7 @@ struct SoundSourceData {
     DefaultParameters default_params;
 };
 
+float default_volume = 1.f;
 std::unordered_map<SoundSource, SoundSourceData> sound_sources;
 std::unordered_map<Sound, SoundData> active_sounds;
 std::unordered_map<int, Sound> channel_map;
@@ -181,8 +182,12 @@ void allocate_effect_channels(unsigned int count) {
             source_data.is_music = true;
             source_data.data.music = Mix_LoadMUS(path.data());
             break;
-        case AudioType::Effect: source_data.data.chunk = Mix_LoadWAV(path.data()); break;
+        case AudioType::Effect:
+            source_data.data.chunk = Mix_LoadWAV(path.data());
+            break;
     }
+
+    source_data.default_params.volume = default_volume;
 
     // Check for errors
     if (source_data.is_music) {
@@ -256,6 +261,20 @@ bool source_is_music(SoundSource source) {
 
     SoundSourceData const& data = sound_sources[source];
     return data.is_music;
+}
+
+void set_default_volume(float volume) {
+    if (volume > 1)
+        volume = 1;
+    if (volume < 0)
+        volume = 0;
+    default_volume = volume;
+    for(auto & it:sound_sources){
+        set_default_volume(it.first,volume);
+    }
+    for(auto & it:active_sounds){
+        set_volume(it.first,volume);
+    }
 }
 
 bool set_default_volume(SoundSource source, float volume) {
