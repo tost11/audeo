@@ -309,6 +309,15 @@ bool set_default_position(SoundSource source, vec3f position) {
     return true;
 }
 
+bool set_default_distance_range_max(float distance) {
+    for(auto & it:sound_sources){
+        set_default_distance_range_max(it.first,distance);
+    }
+    for(auto & it:active_sounds){
+        set_distance_range_max(it.first,distance);
+    }
+}
+
 bool set_default_distance_range_max(SoundSource source, float distance) {
     if (!is_valid(source)) {
         return false;
@@ -482,6 +491,10 @@ bool set_position(Sound sound, vec3f position) {
     data.position = position;
 
     return true;
+}
+
+void set_distance_range_max(float distance){
+
 }
 
 bool set_distance_range_max(Sound sound, float distance) {

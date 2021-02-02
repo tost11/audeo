@@ -9,6 +9,9 @@ struct vec3f {
     float x = 0.0f;
     float y = 0.0f;
     float z = 0.0f;
+    vec3f()=default;
+    vec3f(float x,float y,float z):
+    x(x),y(y),z(z){}
 };
 
 AUDEO_API vec3f operator-(vec3f const& lhs, vec3f const& rhs);

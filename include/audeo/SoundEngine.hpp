@@ -147,6 +147,8 @@ AUDEO_API bool set_default_position(SoundSource source, vec3f position);
 AUDEO_API bool set_default_distance_range_max(SoundSource source,
                                               float distance);
 
+bool set_default_distance_range_max(float distance);
+
 // Functions that control sounds
 
 // Play a sound source. loop_count is the amount of times we loop the sound.
