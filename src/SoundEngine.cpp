@@ -130,7 +130,7 @@ bool init(InitInfo const& info) {
         return false;
     }
     // Load dynamic libraries for SDL_Mixer
-    const int flags = MIX_INIT_FLAC | MIX_INIT_MOD | MIX_INIT_OGG | MIX_INIT_MP3;
+    const int flags = info.flags;
     if ((flags & Mix_Init(flags)) != flags) {
         std::string error = Mix_GetError();
         AUDEO_THROW(

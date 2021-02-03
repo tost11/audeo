@@ -85,6 +85,8 @@ struct InitInfo {
     // The amount of effect channels to allocate. This effectively controls
     // how many sound effects can be played at once. Defaults to 16
     unsigned int effect_channels = 16;
+    //sdl mixer init flags
+    int flags = MIX_INIT_FLAC | MIX_INIT_MOD | MIX_INIT_OGG | MIX_INIT_MP3;
 };
 
 AUDEO_API bool init(InitInfo const& info = InitInfo {});
