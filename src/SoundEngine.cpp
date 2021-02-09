@@ -40,6 +40,7 @@ struct SoundSourceData {
 };
 
 float default_volume = 1.f;
+float volume_distance_factor = 1;
 std::unordered_map<SoundSource, SoundSourceData> sound_sources;
 std::unordered_map<Sound, SoundData> active_sounds;
 std::unordered_map<int, Sound> channel_map;
@@ -294,6 +295,17 @@ bool set_default_volume(SoundSource source, float volume) {
     return true;
 }
 
+void set_distance_factor(float factor){
+    if(factor > 1.f){
+        factor = 1.f;
+    }
+    if(factor < 0.f){
+        factor = 0.f;
+    }
+    volume_distance_factor = factor;
+    set_default_volume(default_volume);//just to update everything
+}
+
 bool set_default_position(SoundSource source, float x, float y, float z) {
     return set_default_position(source, {x, y, z});
 }
@@ -309,7 +321,7 @@ bool set_default_position(SoundSource source, vec3f position) {
     return true;
 }
 
-bool set_default_distance_range_max(float distance) {
+void set_default_distance_range_max(float distance) {
     for(auto & it:sound_sources){
         set_default_distance_range_max(it.first,distance);
     }
@@ -627,6 +639,14 @@ static void set_effect_position(int channel, vec3f position, float max_distance)
 
     std::uint8_t mapped_distance =
         static_cast<std::int8_t>(map_range(0, max_distance, 0, sdl_max_distance, raw_distance));
+
+    int facValue = (int)(volume_distance_factor * 255.f);
+    int facDif = 255-facValue;
+    if (mapped_distance < facValue) {
+        mapped_distance = 0;
+    } else {
+        mapped_distance = 255 * (mapped_distance-facValue) / facDif;
+    }
 
     Mix_SetPosition(channel, static_cast<std::int16_t>(raw_angle), mapped_distance);
 }

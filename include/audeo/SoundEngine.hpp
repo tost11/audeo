@@ -149,7 +149,7 @@ AUDEO_API bool set_default_position(SoundSource source, vec3f position);
 AUDEO_API bool set_default_distance_range_max(SoundSource source,
                                               float distance);
 
-bool set_default_distance_range_max(float distance);
+void set_default_distance_range_max(float distance);
 
 // Functions that control sounds
 
@@ -219,6 +219,8 @@ AUDEO_API bool set_position(Sound sound, float x, float y, float z);
 
 // Set the maximum distance this sound can be heard from
 AUDEO_API bool set_distance_range_max(Sound sound, float distance);
+
+AUDEO_API void set_distance_factor(float factor);
 
 // Functionality to control the positional audio.
 
