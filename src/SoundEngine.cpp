@@ -45,6 +45,9 @@ std::unordered_map<SoundSource, SoundSourceData> sound_sources;
 std::unordered_map<Sound, SoundData> active_sounds;
 std::unordered_map<int, Sound> channel_map;
 
+std::mutex callbackMutex;
+std::vector<int> callBackChannels;
+
 // Default constructed to (0, 0, 0)
 vec3f listener_pos;
 vec3f listener_forward = {0.0f, 0.0f, -1.0f};
@@ -62,6 +65,9 @@ using SoundHandleGenerator = HandleGenerator<Sound>;
 using SourceHandleGenerator = HandleGenerator<SoundSource>;
 
 struct SoundFinishedCallbacks {
+
+
+
     static void remove_sound_from_map(int channel) {
         if (auto sound_it = channel_map.find(channel); sound_it != channel_map.end()) {
             Sound sound = sound_it->second;
@@ -74,14 +80,24 @@ struct SoundFinishedCallbacks {
     }
 
     static void channel_callback(int channel) {
-        remove_sound_from_map(channel);
-        // Unregister all effects from this channel, so that they won't apply to
-        // the next sound that plays here
-        Mix_UnregisterAllEffects(channel);
+        std::unique_lock<std::mutex> lock(callbackMutex);
+        callBackChannels.push_back(channel);
+
+
+
+        //remove_sound_from_map(channel);
+        //// Unregister all effects from this channel, so that they won't apply to
+        //// the next sound that plays here
+        //Mix_UnregisterAllEffects(channel);
+
     }
     static void music_callback() {
-        // -1 is the music channel in the channel map
-        remove_sound_from_map(-1);
+        std::unique_lock<std::mutex> lock(callbackMutex);
+        callBackChannels.push_back(-1);
+
+
+        //// -1 is the music channel in the channel map
+        //remove_sound_from_map(-1);
     }
 };
 
@@ -146,6 +162,22 @@ bool init(InitInfo const& info) {
     Mix_ChannelFinished(&SoundFinishedCallbacks::channel_callback);
 
     return true;
+}
+
+void update(){
+    std::unique_lock<std::mutex> lock(callbackMutex);
+    for(auto & it:callBackChannels){
+        if(it == -1){
+            // -1 is the music channel in the channel map
+            SoundFinishedCallbacks::remove_sound_from_map(-1);
+        }else{
+            SoundFinishedCallbacks::remove_sound_from_map(it);
+            // Unregister all effects from this channel, so that they won't apply to
+            // the next sound that plays here
+            //Mix_UnregisterAllEffects(it);
+        }
+    }
+    callBackChannels.clear();
 }
 
 void quit() {

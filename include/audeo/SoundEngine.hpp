@@ -12,6 +12,7 @@
 #include <optional>
 #include <string_view>
 #include <utility>
+#include <mutex>
 
 namespace audeo {
 
@@ -92,6 +93,8 @@ struct InitInfo {
 AUDEO_API bool init(InitInfo const& info = InitInfo {});
  
 AUDEO_API void quit();
+
+AUDEO_API void update();
 
 // Returns the name of the currently active audio driver
 AUDEO_API std::string get_audio_driver_name();
