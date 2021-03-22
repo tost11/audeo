@@ -47,6 +47,7 @@ std::unordered_map<int, Sound> channel_map;
 
 std::mutex callbackMutex;
 std::vector<int> callBackChannels;
+int onRemove = -1;
 
 // Default constructed to (0, 0, 0)
 vec3f listener_pos;
@@ -80,9 +81,12 @@ struct SoundFinishedCallbacks {
     }
 
     static void channel_callback(int channel) {
+        //if(onRemove == channel){
+        //    return;
+        //}
         std::unique_lock<std::mutex> lock(callbackMutex);
         callBackChannels.push_back(channel);
-
+        Mix_UnregisterAllEffects(channel);
 
 
         //remove_sound_from_map(channel);
@@ -174,7 +178,9 @@ void update(){
             SoundFinishedCallbacks::remove_sound_from_map(it);
             // Unregister all effects from this channel, so that they won't apply to
             // the next sound that plays here
+            //onRemove = it;
             //Mix_UnregisterAllEffects(it);
+            //onRemove = -1;
         }
     }
     callBackChannels.clear();
