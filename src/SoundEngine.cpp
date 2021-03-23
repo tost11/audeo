@@ -10,6 +10,7 @@
 #include <functional>
 #include <string>
 #include <unordered_map>
+#include <set>
 
 namespace audeo {
 
@@ -46,7 +47,7 @@ std::unordered_map<Sound, SoundData> active_sounds;
 std::unordered_map<int, Sound> channel_map;
 
 std::mutex callbackMutex;
-std::vector<int> callBackChannels;
+std::set<int> callBackChannels;
 int onRemove = -1;
 
 // Default constructed to (0, 0, 0)
@@ -83,9 +84,9 @@ struct SoundFinishedCallbacks {
     static void channel_callback(int channel) {
         //if(onRemove == channel){
         //    return;
-        //}
+        //}Invalid
         std::unique_lock<std::mutex> lock(callbackMutex);
-        callBackChannels.push_back(channel);
+        callBackChannels.emplace(channel);
         Mix_UnregisterAllEffects(channel);
 
 
@@ -97,7 +98,7 @@ struct SoundFinishedCallbacks {
     }
     static void music_callback() {
         std::unique_lock<std::mutex> lock(callbackMutex);
-        callBackChannels.push_back(-1);
+        callBackChannels.emplace(-1);
 
 
         //// -1 is the music channel in the channel map
